@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Удаление друзей VK</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 100px;
+    }
+
+    .container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"] {
+      width: 400px;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Удаление друзей VK</h2>
+    <input type="text" id="tokenInput" placeholder="Введите токен доступа VK">
+    <button onclick="deleteFriends()">Удалить всех друзей</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function deleteFriends() {
+      const token = document.getElementById('tokenInput').value;
+
+      const response = await fetch('http://127.0.0.1:8000/delete_friends', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token })
+      });
+
+      const data = await response.json();
+      document.getElementById('result').textContent = 'Запрос отправлен. Ответ: ' + JSON.stringify(data);
+    }
+  </script>
+</body>
+</html>
