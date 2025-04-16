@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirect Page</title>
+  <script>
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.hash.substring(1));
+      const token = params.get("access_token");
+
+      if (token) {
+        // Сохраняем токен в localStorage
+        localStorage.setItem("vk_token", token);
+
+        // Перенаправляем на главную страницу
+        window.location.href = "https://apostol228.github.io/CleanVK/";
+      } else {
+        console.log("Токен не найден в URL.");
+      }
+    };
+  </script>
+</head>
+<body>
+  <p>Пожалуйста, подождите...</p>
+</body>
+</html>
