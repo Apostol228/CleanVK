@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>VK Очистка</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+    button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .green { background-color: #4CAF50; color: white; }
+    .blue { background-color: #2196F3; color: white; }
+    #log {
+      margin-top: 20px;
+      white-space: pre-line;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      height: 200px;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
+<body>
+  <h2>VK Очистка (MVP)</h2>
+
+  <button class="green" onclick="getToken()">Получить токен VK</button><br><br>
+
+  <label for="token">Введите токен VK:</label><br>
+  <input type="text" id="token" style="width:100%; padding:8px;" placeholder="Токен будет вставлен автоматически"><br><br>
+
+  <button class="blue" onclick="callFunction('delete_friends')">Удалить всех друзей</button>
+  <button class="blue" onclick="callFunction('leave_groups')">Отписаться от сообществ</button>
+  <button class="blue" onclick="callFunction('clear_wall')">Очистить стену</button>
+  <button class="blue" onclick="callFunction('delete_photos')">Удалить все фото</button>
+
+  <div id="log"></div>
+
+  <script>
+    window.addEventListener("load", function () {
+      const hash = window.location.hash;
+
+      // 1. Если токен в URL — вставляем и сохраняем
+      if (hash.includes("access_token")) {
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get("access_token");
+        if (token) {
+          document.getElementById("token").value = token;
+          localStorage.setItem("vk_token", token); // Сохраняем токен
+          console.log("Токен получен и сохранён:", token);
+        }
+      } else {
+        // 2. Если токена в URL нет — пробуем взять из localStorage
+        const savedToken = localStorage.getItem("vk_token");
+        if (savedToken) {
+          document.getElementById("token").value = savedToken;
+          console.log("Токен подставлен из localStorage:", savedToken);
+        } else {
+          console.log("Токен не найден.");
+        }
+      }
+    });
+
+    function getToken() {
+      const url = 'https://oauth.vk.com/authorize?client_id=6121396&display=page&redirect_uri=https://apostol228.github.io/CleanVK/redirect_page.html&scope=groups,offline&response_type=token&v=5.199';
+      window.open(url, '_blank');
+    }
+
+    function log(msg) {
+      document.getElementById('log').innerText += msg + "\n";
+    }
+
+    function callFunction(action) {
+      const token = document.getElementById('token').value;
+      if (!token) {
+        alert('Введите токен!');
+        return;
+      }
+
+      // Сохраняем токен при каждом действии
+      localStorage.setItem("vk_token", token);
+
+      log(`⏳ Выполняется: ${action}`);
+
+      fetch(`http://localhost:8000/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      })
+      .then(res => res.json())
+      .then(data => {
+        log(`✅ ${data.message}`);
+      })
+      .catch(err => {
+        log(`❌ Ошибка: ${err}`);
+      });
+    }
+  </script>
+</body>
+</html>
